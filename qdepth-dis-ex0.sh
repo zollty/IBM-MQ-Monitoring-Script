@@ -10,7 +10,9 @@
 qmngr_name="QMEMBFE"
 queue_name="BMSRESPONSE_MNG"
 
-path="/tmp/$(head -n 20 /dev/urandom | cksum | cut -f1 -d ' ')"
-echo "dis qs(${queue_name})" > ${path}
-runmqsc ${qmngr_name} < ${path} | awk '/CURDEPTH/ {n=index($1, ")");print substr($1,10,n-10)}'
-rm -f ${path}
+out=$(
+runmqsc ${qmngr_name} <<EOF
+dis qs(${queue_name})
+EOF
+)
+echo "$out" | awk '/CURDEPTH/ {n=index($1, ")");print substr($1,10,n-10)}'

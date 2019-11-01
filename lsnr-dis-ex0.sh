@@ -6,7 +6,9 @@
 qmngr_name="QMEMBFE"
 listener_name="QMEMBFE"
 
-path="/tmp/$(head -n 20 /dev/urandom | cksum | cut -f1 -d ' ')"
-echo "dis lsstatus(${listener_name})" > ${path}
-runmqsc ${qmngr_name} < ${path} | sed -n '7,12p'
-rm -f ${path}
+out=$(
+runmqsc ${qmngr_name} <<EOF
+dis lsstatus(${listener_name})
+EOF
+)
+echo "$out" | sed -n '7,12p'
